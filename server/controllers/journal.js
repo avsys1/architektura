@@ -14,4 +14,8 @@ router.post("/", (req, res) => {
   journal.createJournal(req, res);
 });
 
+router.post("/write", (req, res) => {
+  journal.writeJournal(req, res);
+});
+
 module.exports = router;

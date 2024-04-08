@@ -22,12 +22,6 @@ function createJournal(req, res) {
   }
 }
 
-/* získáš jméno souboru, pokud existuje, pošleš http 409, pokud neexistuje, vytvoříš ho. */
-/**
- * Funkce na získání journalu
- * @param {*} req
- * @param {*} res
- */
 function getJournal(req, res) {
   const name = req.query.name;
   console.log(name);
@@ -53,4 +47,21 @@ function listJournals(req, res) {
   res.status(200).send(journalNames);
 }
 
-module.exports = { getJournal, createJournal, listJournals };
+function writeJournal(req, res) {
+  const name = req.query.name;
+  const entry = req.body.entry;
+  const filePath = __dirname + "/../data/journals";
+  const fileName = name + ".json";
+  console.log(fileName);
+  const fullPath = filePath + "/" + fileName;
+  if (fs.existsSync(fullPath)) {
+    const journalData = fs.readFileSync(fullPath, "utf8");
+    const updatedData = journalData + "\n" + entry;
+    fs.writeFileSync(fullPath, updatedData);
+    res.status(200).send("Journal entry added successfully");
+  } else {
+    res.status(404).send("Journal not found");
+  }
+}
+
+module.exports = { getJournal, createJournal, listJournals, writeJournal };
