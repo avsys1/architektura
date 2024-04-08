@@ -52,11 +52,21 @@ function writeJournal(req, res) {
   const entry = req.body.entry;
   const filePath = __dirname + "/../data/journals";
   const fileName = name + ".json";
-  console.log(fileName);
   const fullPath = filePath + "/" + fileName;
+
+  // Create an object to store the entry
+  const entryObj = {
+    timestamp: new Date().toISOString(),
+    entry: entry,
+  };
+
+  // Convert the entry object to JSON format
+  const entryJSON = JSON.stringify(entryObj);
+
   if (fs.existsSync(fullPath)) {
     const journalData = fs.readFileSync(fullPath, "utf8");
-    const updatedData = journalData + "\n" + entry;
+    // Append the new entry JSON to the existing data
+    const updatedData = journalData + "\n" + entryJSON;
     fs.writeFileSync(fullPath, updatedData);
     res.status(200).send("Journal entry added successfully");
   } else {
