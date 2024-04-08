@@ -8,7 +8,6 @@ const app = express();
 const port = 8000;
 
 const userController = require("./controllers/users");
-const loginController = require("./controllers/login");
 const journalController = require("./controllers/journal");
 
 app.use(express.json()); // podpora pro application/json
@@ -16,8 +15,7 @@ app.use(express.urlencoded({ extended: true })); // podpora pro application/x-ww
 
 app.use(bodyParser.json());
 
-app.use("/user", userController); // Řeší uživatelské účty
-app.use("/login", loginController); // Řeší přihlašování
+app.use("/users", userController); // Řeší uživatelské účty
 app.use("/journal", journalController); // Řeší zápisky
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

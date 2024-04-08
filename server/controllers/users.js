@@ -1,12 +1,12 @@
 const express = require("express");
-const { getUsers } = require("../abl/users");
+const { getUsers, createUser } = require("../abl/users");
 const router = express.Router();
 
-router.get("/users", (req, res) => {
+router.get("/", (req, res) => {
   getUsers(req, res);
 });
 
-router.post("/users", (req, res) => {
-  //createUser(req, res);
+router.post("/", (req, res) => {
+  createUser(req, res);
 });
 module.exports = router;
