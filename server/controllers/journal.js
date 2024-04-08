@@ -3,11 +3,14 @@ const router = express.Router();
 const journal = require("../abl/journal");
 
 router.get("/", (req, res) => {
-  res.send("Snažíš se získat journal");
+  journal.getJournal(req, res);
+});
+
+router.get("/list", (req, res) => {
+  journal.listJournals(req, res);
 });
 
 router.post("/", (req, res) => {
-  res.send("Snažíš se vytvořit journal");
   journal.createJournal(req, res);
 });
 

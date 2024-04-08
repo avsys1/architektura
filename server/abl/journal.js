@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 
 const filePath = "/../data/journals";
 /**
@@ -29,8 +30,27 @@ function createJournal(req, res) {
  */
 function getJournal(req, res) {
   const name = req.query.name;
-
-  /* Logika - Jestli bude existovat ve složce journals soubor, který má jméno podle proměnné name, pošleme mu ho pomocí res.json(soubor).
-   * Pokud ne, pošleme mu status 404 a zprávu "Journal not found". */
+  console.log(name);
+  const filePath = __dirname + "/../data/journals";
+  const fileName = name + ".json";
+  const fullPath = filePath + "/" + fileName;
+  if (fs.existsSync(fullPath)) {
+    const journalData = fs.readFileSync(fullPath, "utf8");
+    res.status(200).send(journalData);
+  } else {
+    res.status(404).send("Journal not found");
+  }
 }
-module.exports = { getJournal, createJournal };
+
+function listJournals(req, res) {
+  const filePath = path.join(__dirname, "/../data/journals");
+  const fileNames = fs
+    .readdirSync(filePath)
+    .filter((file) => file.endsWith(".json"));
+  const journalNames = fileNames.map((fileName) =>
+    fileName.replace(".json", "")
+  );
+  res.status(200).send(journalNames);
+}
+
+module.exports = { getJournal, createJournal, listJournals };
