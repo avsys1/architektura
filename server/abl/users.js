@@ -1,7 +1,13 @@
 const fs = require("fs");
-
 function getUsers(req, res) {
-  res.send("");
+  let users = [];
+  const filePath = __dirname + "/../data/users";
+  const files = fs.readdirSync(filePath);
+  files.forEach((file) => {
+    const user = JSON.parse(fs.readFileSync(filePath + "/" + file, "utf8")); // Načteme data uživatele
+    users.push(user);
+  });
+  res.send(users);
 }
 
 function createUser(req, res) {

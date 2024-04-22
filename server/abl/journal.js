@@ -59,6 +59,42 @@ function getJournal(req, res) {
   }
 }
 
+function getListOfUserJournals(req, res) {
+  const id = req.params.id;
+  let fieldOfUserJournals = [];
+  const userJournals = {
+    journals: [],
+  };
+  const fullPathToUserFile = __dirname + "/../data/users/" + id + ".json";
+
+  if (fs.existsSync(fullPathToUserFile)) {
+    const journals = fs.readFileSync(fullPathToUserFile, "utf8");
+    const userJournals = JSON.parse(journals).journals;
+
+    if (userJournals === undefined || userJournals?.length === 0)
+      return res.status(204).send("Uživatel nemá žádné zápisky");
+
+    userJournals.forEach((journal) => {
+      fieldOfUserJournals.push(journal.journalid);
+    });
+  } else {
+    res.status(404).send("User not found");
+  }
+  for (let i = 0; i < fieldOfUserJournals.length; i++) {
+    const journalName = fieldOfUserJournals[i];
+    console.log(journalName);
+    const journalPath =
+      __dirname + "/../data/journals/" + journalName + ".json";
+    const journalData = fs.readFileSync(journalPath, "utf8");
+    userJournals.journals.push({
+      id: journalName,
+      content: JSON.parse(journalData),
+    });
+  }
+
+  res.send(userJournals);
+}
+
 function listJournals(req, res) {
   const filePath = path.join(__dirname, "/../data/journals");
   const fileNames = fs
@@ -116,4 +152,10 @@ function writeJournal(req, res) {
   }
 }
 
-module.exports = { getJournal, createJournal, listJournals, writeJournal };
+module.exports = {
+  getJournal,
+  createJournal,
+  getListOfUserJournals,
+  listJournals,
+  writeJournal,
+};

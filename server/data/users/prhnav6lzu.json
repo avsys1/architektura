@@ -1,4 +1,9 @@
 {
-  "username": "Admin",
-  "userid": "prhnav6lzu"
+  "firstname": "Admin",
+  "userid": "prhnav6lzu",
+  "journals": [
+    {
+      "journalid": "journal10"
+    }
+  ]
 }

@@ -10,6 +10,10 @@ router.get("/list", (req, res) => {
   journal.listJournals(req, res);
 });
 
+router.get("/list/:id", (req, res) => {
+  journal.getListOfUserJournals(req, res);
+});
+
 router.post("/", (req, res) => {
   journal.createJournal(req, res);
 });
