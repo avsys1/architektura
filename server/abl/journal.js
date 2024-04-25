@@ -10,6 +10,9 @@ const filePath = "/../data/journals";
 
 function createJournal(req, res) {
   const name = req.body.name;
+  if (name === undefined || name === null || name === "")
+    return res.status(400).send("Journal name is required");
+
   const id = req.body.userid;
   const filePath = __dirname + "/../data/";
 
@@ -17,8 +20,21 @@ function createJournal(req, res) {
   const fullPathToUser = filePath + "/users/" + userFileName;
 
   if (!fs.existsSync(fullPathToUser)) {
-    return res.status(401).send("Zadal jste špatné ID uživatele");
+    return res.status(401).send("You are not authorized to create a journal");
   }
+
+  const userFile = fs.readFileSync(fullPathToUser, "utf8");
+
+  const user = JSON.parse(userFile);
+
+  if (user.journals.find((journal) => journal.journalid === name))
+    return res.status(409).send("Journal already exists");
+
+  user.journals.push({
+    journalid: name,
+  });
+
+  fs.writeFileSync(fullPathToUser, JSON.stringify(user, null, 2), "utf8");
 
   const fileName = name + ".json";
   const fullPathToJournal = filePath + "/journals/" + fileName;

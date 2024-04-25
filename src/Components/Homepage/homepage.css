@@ -1,0 +1,49 @@
+#homepage {
+  padding: 3rem;
+  height: 100%;
+  width: 100%;
+  background-color: darkgray;
+}
+
+#homepage #homepage__header {
+  padding: 1rem;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+}
+
+#homepage #homepage__entry {
+  background-color: white;
+  justify-content: space-between;
+  display: flex;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+#homepage #homepage__entry__buttons {
+  justify-content: space-between;
+  display: flex;
+  align-items: end;
+}
+
+#homepage #homepage__entry__buttons p {
+  padding: 0 0.5rem;
+}
+
+.card {
+  background-color: white;
+  width: 100% !important;
+}
+
+.card-body {
+  justify-content: space-between;
+  display: flex;
+  padding: 3.5rem 2rem;
+}
+
+#card__buttons {
+  display: flex;
+}
+
+#card__buttons p {
+  padding: 0 0.5rem;
+}

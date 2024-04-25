@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
+import "./homepage.css";
 const Homepage = () => {
   const [users, setUsers] = useState([]);
   const [activeUser, setActiveUser] = useState(null);
@@ -31,19 +32,26 @@ const Homepage = () => {
   }, [activeUser]);
   return (
     <>
-      <Navbar users={users} setActiveUser={setActiveUser} />
-      <div>
-        <h1>Welcome to the Homepage!</h1>
+      <Navbar
+        users={users}
+        setUsers={setUsers}
+        setActiveUser={setActiveUser}
+        activeUser={activeUser}
+        setJournals={setJournals}
+      />
+      <div id="homepage">
         {journals?.map((journal) => (
-          <Card style={{ width: "18rem" }}>
-            <Card.Body>
-              <Card.Title>{journal.id}</Card.Title>
-              <Card.Text></Card.Text>
-              <Link to={"/journal/" + journal.id}>
-                <Button variant="primary">Go to journal</Button>
-              </Link>
-            </Card.Body>
-          </Card>
+          <Link to={"/journal/" + journal.id}>
+            <Card style={{ width: "18rem" }}>
+              <Card.Body>
+                <Card.Title>{journal.id}</Card.Title>
+                <div id="card__buttons">
+                  <Card.Text>Edit</Card.Text>
+                  <Card.Text>Delete</Card.Text>
+                </div>
+              </Card.Body>
+            </Card>
+          </Link>
         ))}
       </div>
     </>

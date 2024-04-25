@@ -3,7 +3,16 @@
   "userid": "prhnav6lzu",
   "journals": [
     {
-      "journalid": "journal10"
+      "journalid": "Journal_1"
+    },
+    {
+      "journalid": "Journal_3"
+    },
+    {
+      "journalid": "Journal_4"
+    },
+    {
+      "journalid": "Journal_5"
     }
   ]
 }

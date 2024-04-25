@@ -1,0 +1,16 @@
+#navbar {
+  margin: 3rem;
+  padding: 1rem;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+}
+
+#navbar #navbar__login {
+  display: flex;
+  justify-content: space-between;
+}
+
+#navbar #navbar__login p {
+  padding: 0 2.5rem;
+}
