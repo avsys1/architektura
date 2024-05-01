@@ -1,12 +1,5 @@
 {
   "firstname": "Admin 2",
   "userid": "prhnav6lzy",
-  "journals": [
-    {
-      "journalid": "test"
-    },
-    {
-      "journalid": "Test_2"
-    }
-  ]
+  "journals": []
 }

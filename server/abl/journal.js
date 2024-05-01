@@ -27,20 +27,11 @@ function createJournal(req, res) {
 
   const user = JSON.parse(userFile);
 
-  if (user.journals.find((journal) => journal.journalid === name))
+  if (user.journals.find((journal) => journal.name == name))
     return res.status(409).send("Journal already exists");
 
-  user.journals.push({
-    journalid: name,
-  });
-
-  fs.writeFileSync(fullPathToUser, JSON.stringify(user, null, 2), "utf8");
-
-  const fileName = name + ".json";
-  const fullPathToJournal = filePath + "/journals/" + fileName;
-
   const entries = {
-    userid: id,
+    name: name,
     entries: [
       {
         timestamp: "2021-03-01T12:00:00.000Z",
@@ -49,26 +40,24 @@ function createJournal(req, res) {
     ],
   };
 
-  if (fs.existsSync(fullPathToJournal)) {
-    res.status(409).send("Journal already exists");
-  } else {
-    fs.writeFileSync(
-      fullPathToJournal,
-      JSON.stringify(entries, null, 2),
-      "utf8"
-    );
-    res.status(200).send("Journal created successfully");
-  }
+  user.journals.push(entries);
+
+  fs.writeFileSync(fullPathToUser, JSON.stringify(user, null, 2), "utf8");
+
+  res.status(200).send("Journal created successfully");
 }
 
 function getJournal(req, res) {
-  const name = req.query.name;
-  console.log(name);
-  const filePath = __dirname + "/../data/journals";
-  const fileName = name + ".json";
+  const username = req.query.username;
+  const name = req.params.name;
+
+  const filePath = __dirname + "/../data/users";
+  const fileName = username + ".json";
   const fullPath = filePath + "/" + fileName;
   if (fs.existsSync(fullPath)) {
-    const journalData = fs.readFileSync(fullPath, "utf8");
+    const journalData = JSON.parse(
+      fs.readFileSync(fullPath, "utf8")
+    ).journals.find((journal) => journal.name == name);
     res.status(200).send(journalData);
   } else {
     res.status(404).send("Journal not found");
@@ -77,10 +66,6 @@ function getJournal(req, res) {
 
 function getListOfUserJournals(req, res) {
   const id = req.params.id;
-  let fieldOfUserJournals = [];
-  const userJournals = {
-    journals: [],
-  };
   const fullPathToUserFile = __dirname + "/../data/users/" + id + ".json";
 
   if (fs.existsSync(fullPathToUserFile)) {
@@ -89,26 +74,10 @@ function getListOfUserJournals(req, res) {
 
     if (userJournals === undefined || userJournals?.length === 0)
       return res.status(204).send("Uživatel nemá žádné zápisky");
-
-    userJournals.forEach((journal) => {
-      fieldOfUserJournals.push(journal.journalid);
-    });
+    res.send(userJournals);
   } else {
     res.status(404).send("User not found");
   }
-  for (let i = 0; i < fieldOfUserJournals.length; i++) {
-    const journalName = fieldOfUserJournals[i];
-    console.log(journalName);
-    const journalPath =
-      __dirname + "/../data/journals/" + journalName + ".json";
-    const journalData = fs.readFileSync(journalPath, "utf8");
-    userJournals.journals.push({
-      id: journalName,
-      content: JSON.parse(journalData),
-    });
-  }
-
-  res.send(userJournals);
 }
 
 function listJournals(req, res) {
@@ -127,9 +96,6 @@ function writeJournal(req, res) {
   const entry = req.body.entry;
   const id = req.body.userid;
 
-  console.log(name);
-  console.log(entry);
-  console.log(id);
   const filePath = __dirname + "/../data/";
   const fileName = name + ".json";
   const fullPath = filePath + "journals/" + fileName;
@@ -168,10 +134,52 @@ function writeJournal(req, res) {
   }
 }
 
+async function deleteJournal(req, res) {
+  const username = req.params.username;
+  const name = req.params.name;
+
+  const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
+  const userFile = fs.readFileSync(fullPathUser, "utf8");
+
+  const user = JSON.parse(userFile);
+
+  user.journals = user.journals.filter((journal) => journal.name != name);
+
+  fs.writeFileSync(fullPathUser, JSON.stringify(user, null, 2), "utf8");
+
+  res.send("Journal deleted successfully");
+}
+
+async function editJournal(req, res) {
+  const username = req.params.username;
+  const oldName = req.params.oldName;
+  const newName = req.params.newName;
+
+  if (newName == undefined || newName == null || newName == "")
+    return res.status(400).send("New name is required");
+
+  console.log(username);
+  console.log(oldName);
+  console.log(newName);
+
+  const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
+  const userFile = fs.readFileSync(fullPathUser, "utf8");
+
+  const user = JSON.parse(userFile);
+
+  user.journals.find((journal) => journal.name == oldName).name = newName;
+
+  fs.writeFileSync(fullPathUser, JSON.stringify(user, null, 2), "utf8");
+
+  res.send("Journal deleted successfully");
+}
+
 module.exports = {
   getJournal,
   createJournal,
   getListOfUserJournals,
   listJournals,
   writeJournal,
+  deleteJournal,
+  editJournal,
 };

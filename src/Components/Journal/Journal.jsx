@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./journal.css";
 function Journal() {
+  const username = useParams().username;
   const id = useParams().id;
   const [entries, setEntries] = useState({
     entries: [],
@@ -10,10 +11,8 @@ function Journal() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/journal", {
-        params: {
-          name: id,
-        },
+      .get("http://localhost:8000/journal/" + id, {
+        params: { username },
       })
       .then((response) => setEntries(response.data))
       .catch((err) => console.log(err));

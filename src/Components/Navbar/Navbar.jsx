@@ -29,7 +29,7 @@ const Navbar = ({
 
     axios
       .get("http://localhost:8000/journal/list/" + activeUser.userid)
-      .then((response) => setJournals(response.data.journals))
+      .then((response) => setJournals(response.data))
       .catch((err) => console.log(err));
   };
   return (

@@ -10,6 +10,36 @@ const Homepage = () => {
   const [activeUser, setActiveUser] = useState(null);
   const [journals, setJournals] = useState([]);
 
+  function loadJournals() {
+    axios
+      .get("http://localhost:8000/journal/list/" + activeUser.userid)
+      .then((response) => setJournals(response.data))
+      .catch((err) => console.log(err));
+  }
+  const deleteJournal = (journal_id) => {
+    axios
+      .delete(
+        "http://localhost:8000/journal/" + activeUser.userid + "/" + journal_id
+      )
+      .then((response) => loadJournals())
+      .catch((err) => console.log(err));
+  };
+
+  const editJournal = (name) => {
+    const newName = prompt("Enter new name");
+    axios
+      .put(
+        "http://localhost:8000/journal/rename/" +
+          activeUser.userid +
+          "/" +
+          name +
+          "/" +
+          newName
+      )
+      .then((response) => loadJournals())
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     axios
       .get("http://localhost:8000/users")
@@ -24,11 +54,7 @@ const Homepage = () => {
   });
 
   useEffect(() => {
-    if (activeUser)
-      axios
-        .get("http://localhost:8000/journal/list/" + activeUser.userid)
-        .then((response) => setJournals(response.data.journals))
-        .catch((err) => console.log(err));
+    if (activeUser) loadJournals();
   }, [activeUser]);
   return (
     <>
@@ -40,19 +66,34 @@ const Homepage = () => {
         setJournals={setJournals}
       />
       <div id="homepage">
-        {journals?.map((journal) => (
-          <Link to={"/journal/" + journal.id}>
-            <Card style={{ width: "18rem" }}>
-              <Card.Body>
-                <Card.Title>{journal.id}</Card.Title>
-                <div id="card__buttons">
-                  <Card.Text>Edit</Card.Text>
-                  <Card.Text>Delete</Card.Text>
-                </div>
-              </Card.Body>
-            </Card>
-          </Link>
-        ))}
+        {journals?.length > 0 &&
+          journals?.map((journal) => (
+            <Link to={"/journal/" + activeUser.userid + "/" + journal.name}>
+              <Card style={{ width: "18rem" }}>
+                <Card.Body>
+                  <Card.Title>{journal.name}</Card.Title>
+                  <div id="card__buttons">
+                    <Card.Text
+                      onClick={(e) => {
+                        e.preventDefault();
+                        editJournal(journal.name);
+                      }}
+                    >
+                      Edit
+                    </Card.Text>
+                    <Card.Text
+                      onClick={(e) => {
+                        e.preventDefault();
+                        deleteJournal(journal.name);
+                      }}
+                    >
+                      Delete
+                    </Card.Text>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Link>
+          ))}
       </div>
     </>
   );
