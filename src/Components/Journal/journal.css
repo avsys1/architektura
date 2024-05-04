@@ -23,6 +23,6 @@
   align-items: end;
 }
 
-#journal #journal__entry__buttons p {
-  padding: 0 0.5rem;
+#journal #journal__entry__buttons button {
+  margin: 0 0.5rem;
 }

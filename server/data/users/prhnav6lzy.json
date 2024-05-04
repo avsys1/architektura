@@ -1,5 +1,10 @@
 {
-  "firstname": "Admin 2",
+  "firstname": "Jan",
   "userid": "prhnav6lzy",
-  "journals": []
+  "journals": [
+    {
+      "name": "test43",
+      "entries": []
+    }
+  ]
 }

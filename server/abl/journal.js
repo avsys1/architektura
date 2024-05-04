@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { checkData } = require("../dataValidator/validateData");
 
 const filePath = "/../data/journals";
 /**
@@ -10,10 +11,11 @@ const filePath = "/../data/journals";
 
 function createJournal(req, res) {
   const name = req.body.name;
-  if (name === undefined || name === null || name === "")
-    return res.status(400).send("Journal name is required");
-
   const id = req.body.userid;
+
+  if (!checkData([id, name]))
+    return res.status(400).send("Your data is missing");
+
   const filePath = __dirname + "/../data/";
 
   const userFileName = id + ".json";
@@ -30,17 +32,26 @@ function createJournal(req, res) {
   if (user.journals.find((journal) => journal.name == name))
     return res.status(409).send("Journal already exists");
 
-  const entries = {
+  const journal = {
     name: name,
     entries: [
       {
-        timestamp: "2021-03-01T12:00:00.000Z",
+        timestamp:
+          new Date().getHours() +
+          ":" +
+          new Date().getMinutes() +
+          " " +
+          new Date().getDate() +
+          "/" +
+          new Date().getMonth() +
+          "/" +
+          new Date().getFullYear(),
         entry: "Journal created",
       },
     ],
   };
 
-  user.journals.push(entries);
+  user.journals.push(journal);
 
   fs.writeFileSync(fullPathToUser, JSON.stringify(user, null, 2), "utf8");
 
@@ -50,6 +61,9 @@ function createJournal(req, res) {
 function getJournal(req, res) {
   const username = req.query.username;
   const name = req.params.name;
+
+  if (!checkData([username, name]))
+    return res.status(400).send("Your data is missing");
 
   const filePath = __dirname + "/../data/users";
   const fileName = username + ".json";
@@ -66,6 +80,9 @@ function getJournal(req, res) {
 
 function getListOfUserJournals(req, res) {
   const id = req.params.id;
+
+  if (!checkData([id])) return res.status(400).send("Your data is missing");
+
   const fullPathToUserFile = __dirname + "/../data/users/" + id + ".json";
 
   if (fs.existsSync(fullPathToUserFile)) {
@@ -92,9 +109,11 @@ function listJournals(req, res) {
 }
 
 function writeJournal(req, res) {
-  const name = req.body.name;
-  const entry = req.body.entry;
-  const id = req.body.userid;
+  /* Destrukturalizace objektu */
+  const { entry, name, id } = req.body;
+
+  if (!checkData([entry, name, id]))
+    return res.status(400).send("Your data is missing");
 
   const filePath = __dirname + "/../data/";
   const fileName = name + ".json";
@@ -135,9 +154,11 @@ function writeJournal(req, res) {
 }
 
 async function deleteJournal(req, res) {
-  const username = req.params.username;
-  const name = req.params.name;
+  /* Destrukturalizace objektu */
+  const { username, name } = req.params;
 
+  if (!checkData([username, name]))
+    return res.status(400).send("Your data is missing");
   const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
   const userFile = fs.readFileSync(fullPathUser, "utf8");
 
@@ -151,16 +172,11 @@ async function deleteJournal(req, res) {
 }
 
 async function editJournal(req, res) {
-  const username = req.params.username;
-  const oldName = req.params.oldName;
-  const newName = req.params.newName;
+  /* Destrukturalizace objektu */
+  const { username, oldName, newName } = req.params;
 
-  if (newName == undefined || newName == null || newName == "")
-    return res.status(400).send("New name is required");
-
-  console.log(username);
-  console.log(oldName);
-  console.log(newName);
+  if (!checkData([username, oldName, newName]))
+    return res.status(400).send("Your data is missing");
 
   const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
   const userFile = fs.readFileSync(fullPathUser, "utf8");
@@ -174,6 +190,95 @@ async function editJournal(req, res) {
   res.send("Journal deleted successfully");
 }
 
+const editEntry = (req, res) => {
+  /* Destrukturalizace objektu */
+  const { username, journalName, entryId, newEntry } = req.params;
+
+  if (!checkData([username, journalName, entryId, newEntry]))
+    return res.status(400).send("Your data is missing");
+
+  const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
+  const userFile = fs.readFileSync(fullPathUser, "utf8");
+
+  const user = JSON.parse(userFile);
+
+  const entry = {
+    timestamp:
+      new Date().getHours() +
+      ":" +
+      new Date().getMinutes() +
+      " " +
+      new Date().getDate() +
+      "/" +
+      new Date().getMonth() +
+      "/" +
+      new Date().getFullYear(),
+    entry: newEntry,
+  };
+
+  user.journals.find((journal) => journal.name == journalName).entries[
+    entryId
+  ] = entry;
+
+  fs.writeFileSync(fullPathUser, JSON.stringify(user, null, 2), "utf8");
+
+  res.status(200).send("Successfully edited entry");
+};
+
+const deleteEntry = (req, res) => {
+  /* Destrukturalizace objektu */
+  const { username, journalName, entryId } = req.params;
+
+  if (!checkData([username, journalName, entryId]))
+    return res.status(400).send("Your data is missing");
+
+  const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
+  const userFile = fs.readFileSync(fullPathUser, "utf8");
+
+  const user = JSON.parse(userFile);
+
+  user.journals
+    .find((journal) => journal.name == journalName)
+    .entries.splice(entryId, 1);
+
+  fs.writeFileSync(fullPathUser, JSON.stringify(user, null, 2), "utf8");
+
+  res.status(200).send("Entry successfully deleted");
+};
+
+const addEntry = (req, res) => {
+  /* Destrukturalizace objektu */
+  const { username, journalName, entry } = req.params;
+  console.log(checkData([username, journalName, entry]));
+  if (!checkData([username, journalName, entry]))
+    return res.status(400).send("Your data is missing");
+
+  const fullPathUser = __dirname + "/../data/users" + "/" + username + ".json";
+  const userFile = fs.readFileSync(fullPathUser, "utf8");
+
+  const user = JSON.parse(userFile);
+
+  const finalEntry = {
+    timestamp:
+      new Date().getHours() +
+      ":" +
+      new Date().getMinutes() +
+      " " +
+      new Date().getDate() +
+      "/" +
+      new Date().getMonth() +
+      "/" +
+      new Date().getFullYear(),
+    entry: entry,
+  };
+
+  user.journals
+    .find((journal) => journal.name == journalName)
+    .entries.push(finalEntry);
+  fs.writeFileSync(fullPathUser, JSON.stringify(user, null, 2), "utf8");
+
+  res.status(200).send("Entry successfully added");
+};
 module.exports = {
   getJournal,
   createJournal,
@@ -182,4 +287,7 @@ module.exports = {
   writeJournal,
   deleteJournal,
   editJournal,
+  editEntry,
+  deleteEntry,
+  addEntry,
 };

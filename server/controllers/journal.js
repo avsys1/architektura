@@ -30,4 +30,16 @@ router.put("/rename/:username/:oldName/:newName", (req, res) => {
   journal.editJournal(req, res);
 });
 
+router.patch("/entry/:username/:journalName/:entryId/:newEntry", (req, res) => {
+  journal.editEntry(req, res);
+});
+
+router.delete("/entry/:username/:journalName/:entryId", (req, res) => {
+  journal.deleteEntry(req, res);
+});
+
+router.post("/entry/:username/:journalName/:entry", (req, res) => {
+  journal.addEntry(req, res);
+});
+
 module.exports = router;
